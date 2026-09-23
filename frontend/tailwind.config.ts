@@ -1,0 +1,2 @@
+import type { Config } from 'tailwindcss';
+export default { content: ['./index.html','./src/**/*.{vue,ts}'], theme: { extend: { colors: { field:'#27745b', sun:'#e9b949', clay:'#b95738' } } }, plugins: [] } satisfies Config;

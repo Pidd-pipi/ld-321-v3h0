@@ -1,0 +1,26 @@
+{
+  "name": "agridispatch-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 18621",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 18621"
+  },
+  "dependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vue": "^3.5.13",
+    "pinia": "^2.3.0",
+    "element-plus": "^2.9.1",
+    "echarts": "^5.5.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "vue-tsc": "^2.1.10",
+    "tailwindcss": "^3.4.17",
+    "postcss": "^8.4.49",
+    "autoprefixer": "^10.4.20"
+  }
+}
