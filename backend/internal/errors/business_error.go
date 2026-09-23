@@ -34,3 +34,17 @@ type MachineOfflineError struct {
 func (e *MachineOfflineError) Error() string {
 	return fmt.Sprintf("machine %s is offline", e.MachineCode)
 }
+
+// StateConflictError 派单状态冲突错误（任务/农机/驾驶员状态不满足派单条件）。
+type StateConflictError struct {
+	Message string
+}
+
+func (e *StateConflictError) Error() string {
+	return e.Message
+}
+
+// NewStateConflict 构造派单状态冲突错误。
+func NewStateConflict(message string) *StateConflictError {
+	return &StateConflictError{Message: message}
+}

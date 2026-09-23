@@ -19,7 +19,8 @@ const swaggerJSON = `{
     "/auth/login": { "post": { "summary": "登录", "tags": ["auth"] } },
     "/auth/me": { "get": { "summary": "当前用户", "tags": ["auth"] } },
     "/dashboard/overview": { "get": { "summary": "调度看板总览", "tags": ["dashboard"] } },
-    "/dashboard/tasks/{id}/dispatch": { "post": { "summary": "一键派单", "tags": ["dashboard"] } },
+    "/tasks/{id}/dispatch": { "post": { "summary": "派单确认（可指定农机/驾驶员，未传沿用推荐资源）", "tags": ["tasks"] } },
+    "/tasks/{id}/reassign": { "post": { "summary": "已派单任务带原因改派", "tags": ["tasks"] } },
     "/dashboard/reports/work/export": { "get": { "summary": "作业报表导出", "tags": ["dashboard"] } }
   }
 }`

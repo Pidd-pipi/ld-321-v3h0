@@ -86,11 +86,26 @@ go run ./cmd/server
 | --- | --- | --- | --- |
 | POST | /auth/login | 登录 | - |
 | GET | /auth/me | 当前用户 | JWT |
-| GET | /dashboard/overview | 调度看板总览（农机/任务/轨迹/统计/保养/驾驶员） | - |
-| POST | /dashboard/tasks/:id/dispatch | 一键派单（推荐空闲农机与驾驶员） | - |
+| GET | /dashboard/overview | 调度看板总览（农机/任务/轨迹/统计/保养/驾驶员，任务含最近派单记录） | - |
+| POST | /tasks/:id/dispatch | 派单确认（body 可传 machineCode/driverName/reason，未传沿用推荐资源） | - |
+| POST | /tasks/:id/reassign | 已派单任务改派（body 传 machineCode/driverName/reason，reason 必填） | - |
 | GET | /dashboard/reports/work/export | 作业报表导出信息 | - |
 | GET | /ws | WebSocket 实时轨迹推送 | - |
 | GET | /healthz | 健康检查（DB + Redis） | - |
+
+派单/改派在单个数据库事务内完成：任务须为待派单/已派单、目标农机须空闲、目标驾驶员须在岗或可派单；条件不满足返回 HTTP 409（错误码 40900）与明确中文原因，任务与资源状态均不变。成功后同步更新任务、农机、驾驶员三方状态并写入派单/改派记录（含原因与旧资源快照）。
+
+派单请求体示例：
+
+```json
+{ "machineCode": "NJ-2026-002", "driverName": "何燕", "reason": "按地块就近派单" }
+```
+
+改派请求体示例：
+
+```json
+{ "machineCode": "NJ-2026-005", "driverName": "周明", "reason": "原农机进入保养" }
+```
 
 ## 环境变量
 

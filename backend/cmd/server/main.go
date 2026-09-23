@@ -55,12 +55,14 @@ func main() {
 
 	userRepo := repository.NewUserRepository(db)
 	dashboardRepo := repository.NewDashboardRepository(db)
+	dispatchRepo := repository.NewDispatchRepository(db)
 
 	authSvc := service.NewAuthService(userRepo, cfg.JWTSecret, cfg.JWTExpire, log)
 	dashboardSvc := service.NewDashboardService(dashboardRepo, redisClient, log)
+	dispatchSvc := service.NewDispatchService(dispatchRepo, redisClient, log)
 	hub := ws.NewHub(log)
 
-	engine := router.Setup(db, redisClient, authSvc, dashboardSvc, hub, cfg, log)
+	engine := router.Setup(db, redisClient, authSvc, dashboardSvc, dispatchSvc, hub, cfg, log)
 
 	srv := &http.Server{
 		Addr:         ":" + cfg.ServerPort,

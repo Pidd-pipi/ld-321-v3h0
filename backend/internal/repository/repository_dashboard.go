@@ -44,9 +44,30 @@ func (r *DashboardRepository) Overview() (*model.FarmOverview, error) {
 	if err := r.db.Find(&ov.Drivers).Error; err != nil {
 		return nil, fmt.Errorf("load drivers: %w", err)
 	}
+	if err := r.attachLatestDispatchRecords(ov); err != nil {
+		return nil, err
+	}
 	ov.Board = r.board(ov)
 	ov.Stats = r.stats(ov.Records)
 	return ov, nil
+}
+
+// attachLatestDispatchRecords 为任务卡片附加最近一条派单/改派记录。
+func (r *DashboardRepository) attachLatestDispatchRecords(ov *model.FarmOverview) error {
+	taskIDs := make([]string, 0, len(ov.Tasks))
+	for i := range ov.Tasks {
+		taskIDs = append(taskIDs, ov.Tasks[i].ID)
+	}
+	records, err := NewDispatchRepository(r.db).LatestRecordsByTask(taskIDs)
+	if err != nil {
+		return err
+	}
+	for i := range ov.Tasks {
+		if rec, ok := records[ov.Tasks[i].ID]; ok {
+			ov.Tasks[i].LatestRecord = rec
+		}
+	}
+	return nil
 }
 
 // board 计算调度看板。

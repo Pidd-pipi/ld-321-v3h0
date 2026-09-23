@@ -21,6 +21,18 @@ export interface Machine {
   currentTask: string;
 }
 
+export interface DispatchRecord {
+  id: string;
+  taskId: string;
+  action: string;
+  machineCode: string;
+  driverName: string;
+  reason: string;
+  prevMachine: string;
+  prevDriver: string;
+  createdAt: string;
+}
+
 export interface FarmTask {
   id: string;
   type: string;
@@ -31,7 +43,26 @@ export interface FarmTask {
   priority: string;
   recommendedMachine: string;
   recommendedDriver: string;
+  assignedMachine: string;
+  assignedDriver: string;
   plannedWindow: string;
+  latestRecord?: DispatchRecord | null;
+}
+
+export interface DispatchRequestBody {
+  machineCode?: string;
+  driverName?: string;
+  reason?: string;
+}
+
+export interface DispatchResult {
+  taskId: string;
+  status: string;
+  machineCode: string;
+  driverName: string;
+  action: string;
+  reason: string;
+  message: string;
 }
 
 export interface TrackPoint {

@@ -37,8 +37,24 @@ CREATE TABLE IF NOT EXISTS farm_tasks (
   priority VARCHAR(16) DEFAULT '中',
   recommended_machine VARCHAR(64) DEFAULT '',
   recommended_driver VARCHAR(64) DEFAULT '',
+  assigned_machine VARCHAR(64) DEFAULT '',
+  assigned_driver VARCHAR(64) DEFAULT '',
   planned_window VARCHAR(64) DEFAULT '',
   created_at DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS dispatch_records (
+  id VARCHAR(32) PRIMARY KEY,
+  task_id VARCHAR(32) NOT NULL,
+  action VARCHAR(16) DEFAULT '',
+  machine_code VARCHAR(32) DEFAULT '',
+  driver_name VARCHAR(64) DEFAULT '',
+  reason VARCHAR(255) DEFAULT '',
+  prev_machine VARCHAR(32) DEFAULT '',
+  prev_driver VARCHAR(64) DEFAULT '',
+  created_at DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3),
+  INDEX idx_dispatch_task (task_id),
+  INDEX idx_dispatch_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS track_points (
