@@ -15,7 +15,9 @@ const overview = ref<FarmOverview>();
 const loading = ref(true);
 const error = ref('');
 
-onMounted(async () => {
+const loadOverview = async () => {
+  loading.value = true;
+  error.value = '';
   try {
     overview.value = await fetchFarmOverview();
     logger.info('farm overview loaded');
@@ -24,7 +26,9 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
-});
+};
+
+onMounted(loadOverview);
 </script>
 
 <template>
@@ -41,7 +45,13 @@ onMounted(async () => {
       </section>
 
       <section class="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-        <TaskBoard :tasks="overview.tasks" />
+        <TaskBoard
+          :tasks="overview.tasks"
+          :machines="overview.machines"
+          :drivers="overview.drivers"
+          :dispatch-records="overview.dispatchRecords"
+          @refresh="loadOverview"
+        />
         <MapTrackPanel :tracks="overview.tracks" />
       </section>
 

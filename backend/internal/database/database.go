@@ -44,6 +44,7 @@ func Connect(dsn string, maxOpen, maxIdle, connMaxLifetime, retryCount, retryInt
 		&model.MaintenanceReminder{},
 		&model.Driver{},
 		&model.DashboardItem{},
+		&model.DispatchRecord{},
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate: %w", err)
 	}
@@ -88,7 +89,7 @@ func Seed(db *gorm.DB) error {
 	}
 	// 任务
 	tasks := []model.FarmTask{
-		{ID: "t1", Type: "耕地", Field: "北岭 1 号田", AreaMu: 180, EstimatedHours: 9.5, Status: "已派单", Priority: "高", RecommendedMachine: "NJ-2026-001", RecommendedDriver: "周明", PlannedWindow: "今日 08:00-18:00"},
+		{ID: "t1", Type: "耕地", Field: "北岭 1 号田", AreaMu: 180, EstimatedHours: 9.5, Status: "已派单", Priority: "高", RecommendedMachine: "NJ-2026-001", RecommendedDriver: "周明", AssignedMachine: "NJ-2026-001", AssignedDriver: "周明", DispatchReason: "春耕抢农时，按推荐资源派单", PlannedWindow: "今日 08:00-18:00"},
 		{ID: "t2", Type: "播种", Field: "西坡旱地", AreaMu: 96, EstimatedHours: 6.0, Status: "待派单", Priority: "中", RecommendedMachine: "NJ-2026-002", RecommendedDriver: "何燕", PlannedWindow: "明日 07:30-14:00"},
 		{ID: "t3", Type: "施肥", Field: "南湾稻田", AreaMu: 132, EstimatedHours: 5.5, Status: "待派单", Priority: "中", RecommendedMachine: "NJ-2026-002", RecommendedDriver: "刘强", PlannedWindow: "今日 14:00-20:00"},
 		{ID: "t4", Type: "收割", Field: "东河麦田", AreaMu: 210, EstimatedHours: 11.0, Status: "已完成", Priority: "高", RecommendedMachine: "NJ-2026-004", RecommendedDriver: "周明", PlannedWindow: "昨日 06:30-17:30"},
@@ -127,12 +128,19 @@ func Seed(db *gorm.DB) error {
 	}
 	// 驾驶员
 	drivers := []model.Driver{
-		{ID: "d1", Name: "周明", LicenseNo: "A2-4101811990", Phone: "13800010001", Shift: "早班", RestDay: "周日", MonthAreaMu: 486, Rating: 4.8, Status: "在岗"},
+		{ID: "d1", Name: "周明", LicenseNo: "A2-4101811990", Phone: "13800010001", Shift: "早班", RestDay: "周日", MonthAreaMu: 486, Rating: 4.8, Status: "作业中"},
 		{ID: "d2", Name: "何燕", LicenseNo: "B2-4101811992", Phone: "13800010002", Shift: "中班", RestDay: "周三", MonthAreaMu: 318, Rating: 4.7, Status: "可派单"},
 		{ID: "d3", Name: "刘强", LicenseNo: "A1-4101811988", Phone: "13800010003", Shift: "夜班", RestDay: "周五", MonthAreaMu: 402, Rating: 4.6, Status: "休息"},
 	}
 	if err := db.Create(&drivers).Error; err != nil {
 		return fmt.Errorf("seed drivers: %w", err)
+	}
+	// 派单记录
+	dispatchRecords := []model.DispatchRecord{
+		{ID: "dr-seed-1", TaskID: "t1", Action: "派单", MachineCode: "NJ-2026-001", DriverName: "周明", Reason: "春耕抢农时，按推荐资源派单", Operator: "调度员"},
+	}
+	if err := db.Create(&dispatchRecords).Error; err != nil {
+		return fmt.Errorf("seed dispatch records: %w", err)
 	}
 	slog.Info("seeded agridispatch demo data")
 	return nil

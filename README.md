@@ -86,11 +86,24 @@ go run ./cmd/server
 | --- | --- | --- | --- |
 | POST | /auth/login | 登录 | - |
 | GET | /auth/me | 当前用户 | JWT |
-| GET | /dashboard/overview | 调度看板总览（农机/任务/轨迹/统计/保养/驾驶员） | - |
-| POST | /dashboard/tasks/:id/dispatch | 一键派单（推荐空闲农机与驾驶员） | - |
+| GET | /dashboard/overview | 调度看板总览（农机/任务/轨迹/统计/保养/驾驶员/最近派单记录） | - |
+| POST | /tasks/:id/dispatch | 派单确认（body 可指定 machineCode/driverName，未传沿用推荐资源，reason 可空） | - |
+| POST | /tasks/:id/reassign | 已派单任务改派（body 可指定新 machineCode/driverName，reason 必填） | - |
 | GET | /dashboard/reports/work/export | 作业报表导出信息 | - |
 | GET | /ws | WebSocket 实时轨迹推送 | - |
 | GET | /healthz | 健康检查（DB + Redis） | - |
+
+### 派单确认与改派规则
+
+- **派单确认** `POST /api/v1/tasks/:id/dispatch`
+  - 请求体：`{ "machineCode": "NJ-2026-005", "driverName": "王芳", "reason": "农时紧张" }`，字段均可省略；省略农机/驾驶员时沿用任务的推荐资源。
+  - 校验：任务必须为「待派单」、农机必须「空闲」、驾驶员必须「在岗」或「可派单」；条件不满足返回 404/409 及明确中文错误信息，任务与资源状态均不变。
+  - 成功：同一数据库事务内更新任务（已派单 + 实际资源 + 原因）、农机（作业中 + 当前任务）、驾驶员（作业中）三方状态，并写入派单记录。
+- **改派** `POST /api/v1/tasks/:id/reassign`
+  - 请求体：`{ "machineCode": "NJ-2026-005", "driverName": "王芳", "reason": "原农机转抢修" }`，其中 `reason` 必填。
+  - 仅「已派单」任务可改派；同一事务内释放旧农机/旧驾驶员并原子占用新资源、更新任务原因、写入带新旧资源快照的改派记录；任一步失败整体回滚。
+  - 新旧农机与驾驶员完全一致时返回 409，不产生记录。
+- 看板总览中的 `dispatchRecords` 为最近派单/改派记录，任务卡片展示每个任务最近一条记录（动作、资源、原因、时间）。
 
 ## 环境变量
 

@@ -37,6 +37,9 @@ CREATE TABLE IF NOT EXISTS farm_tasks (
   priority VARCHAR(16) DEFAULT '中',
   recommended_machine VARCHAR(64) DEFAULT '',
   recommended_driver VARCHAR(64) DEFAULT '',
+  assigned_machine VARCHAR(64) DEFAULT '',
+  assigned_driver VARCHAR(64) DEFAULT '',
+  dispatch_reason VARCHAR(255) DEFAULT '',
   planned_window VARCHAR(64) DEFAULT '',
   created_at DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -90,6 +93,20 @@ CREATE TABLE IF NOT EXISTS drivers (
   rating DECIMAL(4,2) DEFAULT 0,
   status VARCHAR(16) DEFAULT '在岗',
   created_at DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS dispatch_records (
+  id VARCHAR(40) PRIMARY KEY,
+  task_id VARCHAR(32) NOT NULL,
+  action VARCHAR(16) DEFAULT '派单',
+  machine_code VARCHAR(32) DEFAULT '',
+  driver_name VARCHAR(64) DEFAULT '',
+  previous_machine VARCHAR(32) DEFAULT '',
+  previous_driver VARCHAR(64) DEFAULT '',
+  reason VARCHAR(255) DEFAULT '',
+  operator VARCHAR(64) DEFAULT '调度员',
+  created_at DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3),
+  INDEX idx_dispatch_task (task_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS dashboard_items (

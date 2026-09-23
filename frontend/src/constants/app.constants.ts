@@ -7,4 +7,11 @@ export const STATUS_COLORS: Record<string, string> = {
   待派单: 'info',
   已派单: 'warning',
   已完成: 'success',
+  在岗: 'success',
+  可派单: 'primary',
+  休息: 'info',
 };
+
+// 派单动作
+export const DISPATCH_ACTION_CONFIRM = '派单';
+export const DISPATCH_ACTION_REASSIGN = '改派';

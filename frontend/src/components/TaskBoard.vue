@@ -1,14 +1,31 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { STATUS_COLORS } from '../constants/app.constants';
-import { dispatchTask } from '../services/storage.service';
-import type { FarmTask } from '../types/domain';
+import type { DispatchRecord, Driver, FarmTask, Machine } from '../types/domain';
+import DispatchDialog from './DispatchDialog.vue';
+import TaskDispatchRecord from './TaskDispatchRecord.vue';
 
-defineProps<{ tasks: FarmTask[] }>();
+const props = defineProps<{
+  tasks: FarmTask[];
+  machines: Machine[];
+  drivers: Driver[];
+  dispatchRecords: DispatchRecord[];
+}>();
 
-const handleDispatch = async (task: FarmTask) => {
-  const result = await dispatchTask(task.id);
-  ElMessage.success(result.message);
+const emit = defineEmits<{ (e: 'refresh'): void }>();
+
+const dialogVisible = ref(false);
+const activeTask = ref<FarmTask | null>(null);
+
+const openDispatch = (task: FarmTask) => {
+  activeTask.value = task;
+  dialogVisible.value = true;
+};
+
+const handleDispatched = () => {
+  ElMessage.success('看板数据已刷新');
+  emit('refresh');
 };
 </script>
 
@@ -29,10 +46,40 @@ const handleDispatch = async (task: FarmTask) => {
             <p class="mt-1 text-sm text-emerald-700">
               推荐 {{ task.recommendedMachine }} / {{ task.recommendedDriver }}
             </p>
+            <p v-if="task.status === '已派单'" class="mt-1 text-sm text-amber-700">
+              已分配 {{ task.assignedMachine }} / {{ task.assignedDriver }}
+            </p>
+            <TaskDispatchRecord :records="dispatchRecords" :task-id="task.id" />
           </div>
-          <el-button size="small" type="primary" @click="handleDispatch(task)">一键派单</el-button>
+          <div class="flex shrink-0 flex-col gap-2">
+            <el-button
+              v-if="task.status === '待派单'"
+              size="small"
+              type="primary"
+              @click="openDispatch(task)"
+            >
+              派单确认
+            </el-button>
+            <el-button
+              v-else-if="task.status === '已派单'"
+              size="small"
+              type="warning"
+              @click="openDispatch(task)"
+            >
+              改派
+            </el-button>
+            <el-tag v-else size="small" type="info">不可操作</el-tag>
+          </div>
         </div>
       </article>
     </div>
+
+    <DispatchDialog
+      v-model:visible="dialogVisible"
+      :task="activeTask"
+      :machines="props.machines"
+      :drivers="props.drivers"
+      @dispatched="handleDispatched"
+    />
   </section>
 </template>

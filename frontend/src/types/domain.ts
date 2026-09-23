@@ -31,7 +31,31 @@ export interface FarmTask {
   priority: string;
   recommendedMachine: string;
   recommendedDriver: string;
+  assignedMachine: string;
+  assignedDriver: string;
+  dispatchReason: string;
   plannedWindow: string;
+}
+
+// DispatchRequest 派单/改派请求：农机与驾驶员可空（空则沿用推荐资源）。
+export interface DispatchRequest {
+  machineCode?: string;
+  driverName?: string;
+  reason?: string;
+}
+
+// DispatchRecord 派单/改派记录。
+export interface DispatchRecord {
+  id: string;
+  taskId: string;
+  action: string;
+  machineCode: string;
+  driverName: string;
+  previousMachine: string;
+  previousDriver: string;
+  reason: string;
+  operator: string;
+  createdAt: string;
 }
 
 export interface TrackPoint {
@@ -95,6 +119,7 @@ export interface FarmOverview {
   records: WorkRecord[];
   maintenance: MaintenanceReminder[];
   drivers: Driver[];
+  dispatchRecords: DispatchRecord[];
   board: DispatchBoard;
   stats: {
     totalAreaMu: number;

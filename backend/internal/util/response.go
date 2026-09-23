@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/agridispatch/agridispatch/internal/constants"
+	apperrors "github.com/agridispatch/agridispatch/internal/errors"
 	"github.com/agridispatch/agridispatch/internal/repository"
 	"github.com/gin-gonic/gin"
 )
@@ -33,6 +34,11 @@ func Fail(c *gin.Context, status, code int, message string) {
 
 // FailError 根据错误类型转换为统一响应。
 func FailError(c *gin.Context, err error) {
+	var bizErr *apperrors.BusinessError
+	if errors.As(err, &bizErr) {
+		Fail(c, bizErr.HTTPStatus, bizErr.Code, bizErr.Message)
+		return
+	}
 	switch {
 	case errors.Is(err, repository.ErrNotFound):
 		Fail(c, http.StatusNotFound, constants.CodeNotFound, err.Error())

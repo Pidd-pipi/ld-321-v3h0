@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { STATUS_COLORS } from '../constants/app.constants';
 import type { Driver } from '../types/domain';
 
 defineProps<{ drivers: Driver[] }>();
@@ -17,6 +18,9 @@ defineProps<{ drivers: Driver[] }>();
         <p class="text-sm text-slate-600">{{ driver.phone }}</p>
         <p class="mt-2 text-sm text-emerald-700">
           {{ driver.shift }} · 休 {{ driver.restDay }} · {{ driver.monthAreaMu }} 亩
+        </p>
+        <p class="mt-1">
+          <el-tag :type="STATUS_COLORS[driver.status] ?? 'info'" size="small">{{ driver.status }}</el-tag>
         </p>
       </article>
     </div>
